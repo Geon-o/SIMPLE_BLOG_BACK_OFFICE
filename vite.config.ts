@@ -4,6 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/SIMPLE_BLOG_BACK_OFFICE/',
   plugins: [react()],
   resolve: {
     alias: [
