@@ -3,12 +3,8 @@ import {createClient} from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseAnonKey) {
-    throw new Error('anon 키 없음');
-}
-
-if (!supabaseUrl) {
-    throw new Error('url 없음');
+if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('치명적인 에러발생 확인요망 env');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

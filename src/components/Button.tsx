@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button as MuiButton } from '@mui/material';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -6,21 +7,19 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({ children, ...props }) => {
   return (
-    <button
+    <MuiButton
+      variant="contained"
+      color="primary"
+      fullWidth
       {...props}
-      style={{
-        width: '100%',
+      sx={{
         padding: '0.75rem',
         borderRadius: '4px',
-        border: 'none',
-        backgroundColor: '#007bff',
-        color: 'white',
-        cursor: 'pointer',
-        opacity: props.disabled ? 0.6 : 1,
+        boxShadow: 'none',
       }}
     >
       {children}
-    </button>
+    </MuiButton>
   );
 };
 
