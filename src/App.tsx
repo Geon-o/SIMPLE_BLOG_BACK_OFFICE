@@ -4,12 +4,19 @@ import LoginPage from './pages/LoginPage';
 import { supabase } from './apis/supabaseClient';
 import type { Session } from '@supabase/supabase-js';
 
-const AdminDashboard = () => (
-    <div style={{padding: '2rem'}}>
-        <h2>Admin Dashboard</h2>
-        <p>Welcome to the blog management page.</p>
-    </div>
-);
+const AdminDashboard = () => {
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    };
+
+    return (
+        <div style={{padding: '2rem'}}>
+            <h2>Admin Dashboard</h2>
+            <p>Welcome to the blog management page.</p>
+            <button onClick={handleLogout}>Logout</button>
+        </div>
+    );
+};
 
 const useAuth = () => {
     const [session, setSession] = useState<Session | null>(null);
