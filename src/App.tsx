@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
+import PostManagementPage from './pages/PostManagementPage';
+import CategoryManagementPage from './pages/CategoryManagementPage';
 import { supabase } from './apis/SupabaseClient';
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
@@ -35,11 +37,7 @@ const AdminDashboard = () => {
                         padding: '2rem',
                     }}
                 >
-                    <p>메인 컨텐츠 영역</p>
-                    {/* Add more content here to test scrolling */}
-                    <div style={{ height: '200vh', background: '#f0f0f0', marginTop: '1rem' }}>
-                        <p>Scrollable content placeholder</p>
-                    </div>
+                    <Outlet /> {/* This is where nested routes will render */}
                 </Box>
             </Box>
         </Box>
@@ -76,10 +74,11 @@ function App() {
                 path="/login"
                 element={isAuthenticated ? <Navigate to="/"/> : <LoginPage/>}
             />
-            <Route
-                path="/"
-                element={isAuthenticated ? <AdminDashboard/> : <Navigate to="/login"/>}
-            />
+            <Route path="/" element={isAuthenticated ? <AdminDashboard/> : <Navigate to="/login"/>}>
+                <Route index element={<p>대시보드 메인 페이지</p>} /> {/* Default content for / */}
+                <Route path="posts" element={<PostManagementPage />} />
+                <Route path="categories" element={<CategoryManagementPage />} />
+            </Route>
             {/* Redirect any other path to the main page logic */}
             <Route path="*" element={<Navigate to="/"/>}/>
         </Routes>
