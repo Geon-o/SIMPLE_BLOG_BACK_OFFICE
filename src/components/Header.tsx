@@ -1,17 +1,35 @@
-import React from 'react';
 import { supabase } from '../apis/SupabaseClient';
-import styles from '../style/Header.module.css';
+import { useNavigate } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button as MuiButton } from '@mui/material';
 
 const Header = () => {
+    const navigate = useNavigate();
     const handleLogout = async () => {
         await supabase.auth.signOut();
     };
 
     return (
-        <header className={styles.header}>
-            <div className={styles.title}>관리자 페이지</div>
-            <button className={styles.button} onClick={handleLogout}>로그아웃</button>
-        </header>
+        <AppBar position="static" color="white" sx={{ height: '60px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+            <Toolbar sx={{ justifyContent: 'space-between', height: '100%' }}>
+                <Typography
+                    variant="h6"
+                    component="div"
+                    color="black"
+                    sx={{
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                        navigate('/');
+                    }}
+                >
+                    관리자 페이지
+                </Typography>
+                <MuiButton color="inherit" variant="text" onClick={handleLogout}>
+                    로그아웃
+                </MuiButton>
+            </Toolbar>
+        </AppBar>
     );
 };
 

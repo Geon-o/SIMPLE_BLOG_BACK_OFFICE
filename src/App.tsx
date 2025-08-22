@@ -6,23 +6,43 @@ import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import styles from './style/App.module.css';
+import { Box } from '@mui/material';
 
 const AdminDashboard = () => {
     return (
-        <div className={styles.dashboard}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh',
+                overflow: 'hidden',
+            }}
+        >
             <Header />
-            <div className={styles.contentWrapper}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flex: 1,
+                    overflow: 'hidden',
+                }}
+            >
                 <Sidebar />
-                <main className={styles.mainContent}>
+                <Box
+                    component="main"
+                    sx={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '2rem',
+                    }}
+                >
                     <p>메인 컨텐츠 영역</p>
                     {/* Add more content here to test scrolling */}
                     <div style={{ height: '200vh', background: '#f0f0f0', marginTop: '1rem' }}>
                         <p>Scrollable content placeholder</p>
                     </div>
-                </main>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </Box>
     );
 };
 

@@ -3,7 +3,7 @@ import FormContainer from '../components/FormContainer';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {supabase} from '../apis/SupabaseClient.ts';
-import styles from '../style/LoginPage.module.css';
+import { Typography, Box } from '@mui/material';
 
 const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -49,8 +49,8 @@ const LoginPage = () => {
     const resetLockout = () => {
         setAttempts(0);
         localStorage.removeItem('loginAttempts');
-        setLockoutUntil(0);
         localStorage.removeItem('lockoutUntil');
+        setLockoutUntil(0);
         setError(null);
     };
 
@@ -95,7 +95,9 @@ const LoginPage = () => {
 
     return (
         <FormContainer>
-            <h2 className={styles.loginTitle}>로그인</h2>
+            <Typography variant="h5" component="h2" align="center" sx={{ marginBottom: '1.5rem' }}>
+                로그인
+            </Typography>
             <form onSubmit={handleLogin}>
                 <Input
                     label="이메일"
@@ -115,19 +117,25 @@ const LoginPage = () => {
                     required
                     disabled={loading || isLockedOut}
                 />
-                {error && <p className={styles.errorMessage}>{error}</p>}
-
-                {isLockedOut && (
-                    <div className={styles.errorMessage}>
-                        <p>{`로그인이 잠겼습니다. ${minutes}분 ${seconds}초 후에 다시 시도하세요.`}</p>
-                    </div>
+                {error && (
+                    <Typography color="error" align="center" sx={{ fontSize: '0.875rem', marginTop: '1rem' }}>
+                        {error}
+                    </Typography>
                 )}
 
-                <div className={styles.buttonWrapper}>
+                {isLockedOut && (
+                    <Box sx={{ textAlign: 'center', marginTop: '1rem', color: 'error.main' }}>
+                        <Typography variant="body2">
+                            {`로그인이 잠겼습니다. ${minutes}분 ${seconds}초 후에 다시 시도하세요.`}
+                        </Typography>
+                    </Box>
+                )}
+
+                <Box sx={{ marginTop: '1.5rem' }}>
                     <Button type="submit" disabled={loading || isLockedOut}>
                         {isLockedOut ? '잠김' : (loading ? '로그인 중...' : '로그인')}
                     </Button>
-                </div>
+                </Box>
             </form>
         </FormContainer>
     );

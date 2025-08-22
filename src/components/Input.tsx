@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../style/Input.module.css';
+import { TextField } from '@mui/material';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -8,16 +8,17 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input: React.FC<InputProps> = ({ label, id, ...props }) => {
   return (
-    <div className={styles.inputGroup}>
-      <label htmlFor={id} className={styles.label}>
-        {label}
-      </label>
-      <input
-        id={id}
-        {...props}
-        className={styles.input}
-      />
-    </div>
+    <TextField
+      label={label}
+      id={id}
+      fullWidth
+      margin="normal"
+      variant="outlined"
+      {...props}
+      sx={{
+        marginBottom: '1rem',
+      }}
+    />
   );
 };
 
