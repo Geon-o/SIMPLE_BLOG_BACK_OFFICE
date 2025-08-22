@@ -1,15 +1,57 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import FormContainer from '../components/FormContainer';
 import Input from '../components/Input';
 import Button from '../components/Button';
-
 import {supabase} from '../apis/SupabaseClient.ts';
+
+const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const [attempts, setAttempts] = useState(() => {
+        const savedAttempts = localStorage.getItem('loginAttempts');
+        return savedAttempts ? parseInt(savedAttempts, 10) : 0;
+    });
+
+    const [lockoutUntil, setLockoutUntil] = useState(() => {
+        const savedLockout = localStorage.getItem('lockoutUntil');
+        return savedLockout ? parseInt(savedLockout, 10) : 0;
+    });
+
+    const [remainingTime, setRemainingTime] = useState(0);
+
+    useEffect(() => {
+        const now = Date.now();
+        if (lockoutUntil > now) {
+            const remaining = Math.ceil((lockoutUntil - now) / 1000);
+            setRemainingTime(remaining);
+
+            const interval = setInterval(() => {
+                setRemainingTime(prev => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        resetLockout();
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [lockoutUntil]);
+
+    const resetLockout = () => {
+        setAttempts(0);
+        localStorage.removeItem('loginAttempts');
+        setLockoutUntil(0);
+        localStorage.removeItem('lockoutUntil');
+        setError(null);
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,13 +67,30 @@ const LoginPage = () => {
             if (error) {
                 throw error;
             }
+            resetLockout(); // Successful login resets attempts
 
         } catch (error: any) {
-            setError('로그인중 에러발생');
+            const newAttempts = attempts + 1;
+            setAttempts(newAttempts);
+            localStorage.setItem('loginAttempts', newAttempts.toString());
+
+            if (newAttempts >= 3) {
+                const lockoutTime = Date.now() + LOCKOUT_DURATION;
+                setLockoutUntil(lockoutTime);
+                localStorage.setItem('lockoutUntil', lockoutTime.toString());
+                setError('로그인 시도 횟수를 초과했습니다.');
+                setRemainingTime(Math.ceil(LOCKOUT_DURATION / 1000));
+            } else {
+                setError(`아이디 또는 비밀번호가 맞지 않습니다. (남은 시도: ${3 - newAttempts}번)`);
+            }
         } finally {
             setLoading(false);
         }
     };
+
+    const isLockedOut = lockoutUntil > Date.now();
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
 
     return (
         <FormContainer>
@@ -44,7 +103,7 @@ const LoginPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    disabled={loading}
+                    disabled={loading || isLockedOut}
                 />
                 <Input
                     label="비밀번호"
@@ -53,15 +112,22 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    disabled={loading}
+                    disabled={loading || isLockedOut}
                 />
                 {error && <p style={{
                     color: 'red', textAlign: 'center', fontSize: '0.875rem',
                     marginTop: '1rem'
                 }}>{error}</p>}
+
+                {isLockedOut && (
+                    <div style={{textAlign: 'center', marginTop: '1rem', color: 'red'}}>
+                        <p>{`로그인이 잠겼습니다. ${minutes}분 ${seconds}초 후에 다시 시도하세요.`}</p>
+                    </div>
+                )}
+
                 <div style={{marginTop: '1.5rem'}}>
-                    <Button type="submit" disabled={loading}>
-                        {loading ? '로그인 중...' : '로그인'}
+                    <Button type="submit" disabled={loading || isLockedOut}>
+                        {isLockedOut ? '잠김' : (loading ? '로그인 중...' : '로그인')}
                     </Button>
                 </div>
             </form>
