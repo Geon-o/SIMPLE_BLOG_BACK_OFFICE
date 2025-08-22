@@ -1,25 +1,28 @@
 import React from 'react';
-import { TextField } from '@mui/material';
+import { TextField, TextFieldProps } from '@mui/material';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  id: string;
+interface CustomInputProps {
+    label: string;
+    id: string;
 }
 
-const Input: React.FC<InputProps> = ({ label, id, ...props }) => {
-  return (
-    <TextField
-      label={label}
-      id={id}
-      fullWidth
-      margin="normal"
-      variant="outlined"
-      {...props}
-      sx={{
-        marginBottom: '1rem',
-      }}
-    />
-  );
+type Props = CustomInputProps & TextFieldProps;
+
+const Input: React.FC<Props> = ({ label, id, ...rest }) => {
+    return (
+        <TextField
+            label={label}
+            id={id}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            {...rest}
+            sx={{
+                marginBottom: '1rem',
+                ...rest.sx,
+            }}
+        />
+    );
 };
 
 export default Input;

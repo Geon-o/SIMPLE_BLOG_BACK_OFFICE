@@ -9,8 +9,8 @@ const Header = () => {
     };
 
     return (
-        <AppBar position="static" color="white" sx={{ height: '60px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-            <Toolbar sx={{ justifyContent: 'space-between', height: '100%' }}>
+        <AppBar position="static" sx={{ height: '60px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', backgroundColor: 'white' }}>
+            <Toolbar sx={{ justifyContent: 'space-between' }}>
                 <Typography
                     variant="h6"
                     component="div"
