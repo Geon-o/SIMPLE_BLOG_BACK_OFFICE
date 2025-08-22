@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import { supabase } from './apis/supabaseClient';
-import type { Session } from '@supabase/supabase-js';
+import { supabase } from './apis/SupabaseClient';
+import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 const AdminDashboard = () => {
     const handleLogout = async () => {
@@ -23,12 +23,12 @@ const useAuth = () => {
 
     useEffect(() => {
         // 컴포넌트가 처음 렌더링될 때 현재 세션 정보를 가져옵니다.
-        supabase.auth.getSession().then(({data: {session}}) => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
         });
 
         // 로그인, 로그아웃 등 인증 상태에 변경이 생길 때마다 콜백 함수가 실행됩니다.
-        const {data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) => {
+        const {data: {subscription}} = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
             setSession(session);
         });
 
