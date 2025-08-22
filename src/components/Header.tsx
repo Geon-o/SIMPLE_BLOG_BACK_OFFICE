@@ -25,7 +25,11 @@ const Header = () => {
                 >
                     관리자 페이지
                 </Typography>
-                <MuiButton color="inherit" variant="text" onClick={handleLogout}>
+                <MuiButton variant="text" onClick={handleLogout} sx={{
+                    backgroundColor: '#2c5e4c',
+                    color: '#ffffff',
+                    borderRadius: '13px',
+                }}>
                     로그아웃
                 </MuiButton>
             </Toolbar>

@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { Box, List, ListItemButton, ListItemText, Typography, ListSubheader, Collapse, ListItemIcon } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
     const [openManagement, setOpenManagement] = useState(true); // Default to open
+    const navigate = useNavigate();
 
     const handleClickManagement = () => {
         setOpenManagement(!openManagement);
+    };
+
+    const handleNavigation = (path: string) => {
+        navigate(path);
     };
 
     return (
@@ -37,10 +43,10 @@ const Sidebar = () => {
                 </ListItemButton>
                 <Collapse in={openManagement} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ py: 0.4, pl: 4 }}> {/* Increased pl for sub-items */}
+                        <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/posts')}>
                             <ListItemText primary="게시물 관리" />
                         </ListItemButton>
-                        <ListItemButton sx={{ py: 0.4, pl: 4 }}> {/* Increased pl for sub-items */}
+                        <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/categories')}>
                             <ListItemText primary="카테고리 관리" />
                         </ListItemButton>
                     </List>
