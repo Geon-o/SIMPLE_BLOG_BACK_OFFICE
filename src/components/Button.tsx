@@ -1,26 +1,29 @@
 import React from 'react';
-import { Button as MuiButton } from '@mui/material';
+import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface CustomButtonProps {
+    children: React.ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, ...props }) => {
-  return (
-    <MuiButton
-      variant="contained"
-      color="primary"
-      fullWidth
-      {...props}
-      sx={{
-        padding: '0.75rem',
-        borderRadius: '4px',
-        boxShadow: 'none',
-      }}
-    >
-      {children}
-    </MuiButton>
-  );
+type Props = CustomButtonProps & MuiButtonProps;
+
+const Button: React.FC<Props> = ({ children, ...rest }) => {
+    return (
+        <MuiButton
+            variant="contained"
+            color="primary"
+            fullWidth
+            {...rest}
+            sx={{
+                padding: '0.75rem',
+                borderRadius: '4px',
+                boxShadow: 'none',
+                ...rest.sx,
+            }}
+        >
+            {children}
+        </MuiButton>
+    );
 };
 
 export default Button;
