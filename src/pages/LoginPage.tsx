@@ -3,6 +3,7 @@ import FormContainer from '../components/FormContainer';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {supabase} from '../apis/SupabaseClient.ts';
+import styles from '../style/LoginPage.module.css';
 
 const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -94,7 +95,7 @@ const LoginPage = () => {
 
     return (
         <FormContainer>
-            <h2 style={{textAlign: 'center', marginBottom: '1.5rem'}}>로그인</h2>
+            <h2 className={styles.loginTitle}>로그인</h2>
             <form onSubmit={handleLogin}>
                 <Input
                     label="이메일"
@@ -114,18 +115,15 @@ const LoginPage = () => {
                     required
                     disabled={loading || isLockedOut}
                 />
-                {error && <p style={{
-                    color: 'red', textAlign: 'center', fontSize: '0.875rem',
-                    marginTop: '1rem'
-                }}>{error}</p>}
+                {error && <p className={styles.errorMessage}>{error}</p>}
 
                 {isLockedOut && (
-                    <div style={{textAlign: 'center', marginTop: '1rem', color: 'red'}}>
+                    <div className={styles.errorMessage}>
                         <p>{`로그인이 잠겼습니다. ${minutes}분 ${seconds}초 후에 다시 시도하세요.`}</p>
                     </div>
                 )}
 
-                <div style={{marginTop: '1.5rem'}}>
+                <div className={styles.buttonWrapper}>
                     <Button type="submit" disabled={loading || isLockedOut}>
                         {isLockedOut ? '잠김' : (loading ? '로그인 중...' : '로그인')}
                     </Button>

@@ -4,16 +4,24 @@ import LoginPage from './pages/LoginPage';
 import { supabase } from './apis/SupabaseClient';
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
-const AdminDashboard = () => {
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-    };
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import styles from './style/App.module.css';
 
+const AdminDashboard = () => {
     return (
-        <div style={{padding: '2rem'}}>
-            <h2>Admin Dashboard</h2>
-            <p>Welcome to the blog management page.</p>
-            <button onClick={handleLogout}>Logout</button>
+        <div className={styles.dashboard}>
+            <Header />
+            <div className={styles.contentWrapper}>
+                <Sidebar />
+                <main className={styles.mainContent}>
+                    <p>메인 컨텐츠 영역</p>
+                    {/* Add more content here to test scrolling */}
+                    <div style={{ height: '200vh', background: '#f0f0f0', marginTop: '1rem' }}>
+                        <p>Scrollable content placeholder</p>
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };
