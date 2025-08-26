@@ -17,6 +17,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import { Search, Add, Edit, Delete } from '@mui/icons-material';
+import NotionApi from '../apis/NotionApi';
 
 // 스타일이 적용된 TableCell 컴포넌트
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -28,52 +29,59 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 // --- 예시 데이터 타입 및 데이터 --- //
 interface Category {
-  id: number;
+  id: string;
   name: string;
   path: string;
-  parentId: number | null; // 최상위 카테고리는 parentId가 null
+  parentId: string | null; // 최상위 카테고리는 parentId가 null
+  parentName?: string;
 }
-
-const mockCategories: Category[] = [
-  { id: 1, name: '프로그래밍', path: '/programming', parentId: null },
-  { id: 101, name: 'React', path: '/programming/react', parentId: 1 },
-  { id: 102, name: 'Java', path: '/programming/java', parentId: 1 },
-  { id: 2, name: '디자인', path: '/design', parentId: null },
-  { id: 201, name: 'UI/UX', path: '/design/ui-ux', parentId: 2 },
-  { id: 3, name: '마케팅', path: '/marketing', parentId: null },
-];
-
-// 계층 구조로 데이터 정렬하는 함수
-const getSortedCategories = (categories: Category[]) => {
-  const categoryMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[] }]));
-  const sorted: Category[] = [];
-  
-  categories.forEach(c => {
-    if (c.parentId) {
-      categoryMap.get(c.parentId)?.children.push(c as any);
-    } 
-  });
-
-  categories.forEach(c => {
-    if (!c.parentId) {
-      sorted.push(c);
-      const children = categoryMap.get(c.id)?.children || [];
-      sorted.push(...children);
-    }
-  });
-
-  return sorted;
-};
-
 
 const CategoryManagementPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const { categoryListApi, subCategoryListApi } = NotionApi();
 
   useEffect(() => {
-    // API 요청 시뮬레이션
-    const sortedData = getSortedCategories(mockCategories);
-    setCategories(sortedData);
+    const fetchCategories = async () => {
+      const categoryData = await categoryListApi();
+      const subCategoryData = await subCategoryListApi();
+
+      const transformedCategories = categoryData.map((item: any) => ({
+        id: item.id,
+        name: item.properties.title.title[0]?.plain_text || '',
+        path: item.properties.path.rich_text[0]?.plain_text || '',
+        parentId: null,
+      }));
+
+      const parentTitleToIdMap = new Map(transformedCategories.map(c => [c.name, c.id]));
+
+      const transformedSubCategories = subCategoryData.map((item: any) => {
+        const parentTitle = item.properties.FK?.select?.name || null;
+        const parentId = parentTitle ? parentTitleToIdMap.get(parentTitle) : null;
+        return {
+          id: item.id,
+          name: item.properties.title.title[0]?.plain_text || '',
+          path: item.properties.path.rich_text[0]?.plain_text || '',
+          parentId: parentId,
+          parentName: parentTitle,
+        }
+      });
+
+      const sorted: Category[] = [];
+      const parents = transformedCategories.sort((a, b) => a.name.localeCompare(b.name));
+
+      parents.forEach(parent => {
+          sorted.push(parent);
+          const children = transformedSubCategories
+              .filter(child => child.parentId === parent.id)
+              .sort((a, b) => a.name.localeCompare(b.name));
+          sorted.push(...children);
+      });
+
+      setCategories(sorted);
+    };
+
+    fetchCategories();
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +130,7 @@ const CategoryManagementPage = () => {
               <TableRow>
                 <StyledTableCell>카테고리명 (Title)</StyledTableCell>
                 <StyledTableCell>경로 (Path)</StyledTableCell>
+                <StyledTableCell>상위 카테고리 (FK)</StyledTableCell>
                 <StyledTableCell align="right">작업</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -133,6 +142,7 @@ const CategoryManagementPage = () => {
                     {category.name}
                   </TableCell>
                   <TableCell>{category.path}</TableCell>
+                  <TableCell>{category.parentName || '-'}</TableCell>
                   <TableCell align="right">
                     <IconButton size="small" color="primary">
                       <Edit fontSize="small" />
