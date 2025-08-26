@@ -46,16 +46,16 @@ const CategoryManagementPage = () => {
       const categoryData = await categoryListApi();
       const subCategoryData = await subCategoryListApi();
 
-      const transformedCategories = categoryData.map((item: any) => ({
+      const transformedCategories: Category[] = categoryData.map((item: any) => ({
         id: item.id,
         name: item.properties.title.title[0]?.plain_text || '',
         path: item.properties.path.rich_text[0]?.plain_text || '',
         parentId: null,
       }));
 
-      const parentTitleToIdMap = new Map(transformedCategories.map(c => [c.name, c.id]));
+      const parentTitleToIdMap = new Map(transformedCategories.map((c: Category) => [c.name, c.id]));
 
-      const transformedSubCategories = subCategoryData.map((item: any) => {
+      const transformedSubCategories: Category[] = subCategoryData.map((item: any) => {
         const parentTitle = item.properties.FK?.select?.name || null;
         const parentId = parentTitle ? parentTitleToIdMap.get(parentTitle) : null;
         return {
@@ -68,13 +68,13 @@ const CategoryManagementPage = () => {
       });
 
       const sorted: Category[] = [];
-      const parents = transformedCategories.sort((a, b) => a.name.localeCompare(b.name));
+      const parents = transformedCategories.sort((a: Category, b: Category) => a.name.localeCompare(b.name));
 
-      parents.forEach(parent => {
+      parents.forEach((parent: Category) => {
           sorted.push(parent);
           const children = transformedSubCategories
-              .filter(child => child.parentId === parent.id)
-              .sort((a, b) => a.name.localeCompare(b.name));
+              .filter((child: Category) => child.parentId === parent.id)
+              .sort((a: Category, b: Category) => a.name.localeCompare(b.name));
           sorted.push(...children);
       });
 
