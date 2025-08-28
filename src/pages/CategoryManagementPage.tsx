@@ -119,11 +119,13 @@ const CategoryManagementPage = () => {
             parentId: selectedParentCategory
         }
 
-        saveCategoryApi(saveData).then(async (r) => {
+        saveCategoryApi(saveData).then(async () => {
             handleCancelNewCategory();
             alert('카테고리가 생성됐습니다.');
             await fetchCategories();
-        });
+        }).catch(() => {
+            alert("저장하던 중 문제발생.");
+        })
     }
 
     const handleCancelNewCategory = () => {
@@ -151,11 +153,14 @@ const CategoryManagementPage = () => {
     };
 
     const handleUpdateCategory = () => {
-        editCategoryApi(editingCategoryData, editingCategoryId).then(async (r) => {
+        editCategoryApi(editingCategoryData, editingCategoryId).then(async () => {
             alert('카테고리가 수정됐습니다.');
             setEditingCategoryId(null);
             await fetchCategories();
         })
+            .catch(() => {
+                alert("수정하던 중 문제발생.");
+            })
     };
     // =======================================================================
 
@@ -164,10 +169,13 @@ const CategoryManagementPage = () => {
 
             if (categories.find(c => c.parentName === category.name)) return alert('하위 카테고리가 존재하여 삭제하지 못함.');
 
-            deleteCategoryApi(category.id).then(async (r) => {
+            deleteCategoryApi(category.id).then(async () => {
                 alert('삭제완');
                 await fetchCategories();
             })
+                .catch(() => {
+                    alert("삭제하던 중 문제발생.");
+                })
         }
     }
 
