@@ -12,7 +12,7 @@ export default function NotionApi() {
         return res.data.results;
     };
 
-    const saveCategoryApi = async (saveData) => {
+    const saveCategoryApi = async (saveData: { name: string, path: string, parentId: string | null }) => {
         const res = await axios.post('https://notion-proxy-api.vercel.app/api/saveCategory', {saveData: saveData}, {
             headers: {
                 'Content-Type': 'application/json'
@@ -21,7 +21,7 @@ export default function NotionApi() {
         return res.data;
     };
 
-    const editCategoryApi = async (editData, pageId) => {
+    const editCategoryApi = async (editData: { name: string, path: string, parentName: string | null }, pageId: string | null) => {
         const res = await axios.post('https://notion-proxy-api.vercel.app/api/editCategory', {editData: editData, pageId: pageId}, {
             headers: {
                 'Content-Type': 'application/json'
@@ -31,7 +31,7 @@ export default function NotionApi() {
         return res.data;
     }
 
-    const deleteCategoryApi = async (pageId) => {
+    const deleteCategoryApi = async (pageId: string) => {
         const res = await axios.post('https://notion-proxy-api.vercel.app/api/deleteCategory', {pageId: pageId}, {
             headers: {
                 'Content-Type': 'application/json'
