@@ -152,11 +152,24 @@ const CategoryManagementPage = () => {
         setEditingCategoryData({ name: category.name, path: category.path, parentName: parentName });
     };
 
-    const handleUpdateCategory = () => {
+    const handleUpdateCategory = (category: Category) => {
+        const subCategoryData = categories.find(c => c.parentId === category.id);
+
         editCategoryApi(editingCategoryData, editingCategoryId).then(async () => {
+            if (subCategoryData) {
+                const editData = {
+                    name: subCategoryData.name as string,
+                    path: subCategoryData.path as string,
+                    parentName: editingCategoryData.name as string || null
+                }
+
+                await editCategoryApi(editData, subCategoryData.pageId);
+            }
+
             alert('카테고리가 수정됐습니다.');
             setEditingCategoryId(null);
             await fetchCategories();
+
         })
             .catch(() => {
                 alert("수정하던 중 문제발생.");
@@ -304,7 +317,7 @@ const CategoryManagementPage = () => {
                                             )}
                                         </TableCell>
                                         <TableCell align="right">
-                                            <Button onClick={handleUpdateCategory} size="small">저장</Button>
+                                            <Button onClick={() => handleUpdateCategory(category)} size="small">저장</Button>
                                             <Button onClick={handleCancelEdit} size="small">취소</Button>
                                         </TableCell>
                                     </TableRow>
