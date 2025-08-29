@@ -46,8 +46,8 @@ const Sidebar = () => {
                         <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/posts')}>
                             <ListItemText primary="게시물 관리" />
                         </ListItemButton>
-                        <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/categories')}>
-                            <ListItemText primary="카테고리 관리" />
+                        <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/tags')}>
+                            <ListItemText primary="태그 관리" />
                         </ListItemButton>
                     </List>
                 </Collapse>

@@ -1,19 +1,21 @@
 import React from 'react';
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 
 interface FormContainerProps {
   children: React.ReactNode;
+  title?: string;
 }
 
-const FormContainer: React.FC<FormContainerProps> = ({ children }) => {
+const FormContainer: React.FC<FormContainerProps> = ({ children, title }) => {
   return (
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center',
         minHeight: '100vh',
         backgroundColor: '#f0f2f5',
+        padding: '2rem',
       }}
     >
       <Paper
@@ -21,9 +23,15 @@ const FormContainer: React.FC<FormContainerProps> = ({ children }) => {
         sx={{
           padding: '2rem',
           borderRadius: '8px',
-          width: '360px',
+          width: '100%',
+          maxWidth: '600px',
         }}
       >
+        {title && (
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center' }}>
+            {title}
+          </Typography>
+        )}
         {children}
       </Paper>
     </Box>
