@@ -24,7 +24,7 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, title }) => {
           padding: '2rem',
           borderRadius: '8px',
           width: '100%',
-          maxWidth: '600px',
+          maxWidth: '400px',
         }}
       >
         {title && (
