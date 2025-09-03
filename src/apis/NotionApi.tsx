@@ -23,4 +23,10 @@ const deleteCategoryApi = async (pageId: string) => {
     return res.data;
 }
 
-export { categoryListApi, saveCategoryApi, deleteCategoryApi };
+const allPostApi = async () => {
+        const res = await axios.post('https://notion-proxy-api.vercel.app/api/allPostList')
+
+        return res.data.results;
+    };
+
+export { categoryListApi, saveCategoryApi, deleteCategoryApi, allPostApi };
