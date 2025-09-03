@@ -24,9 +24,23 @@ const deleteCategoryApi = async (pageId: string) => {
 }
 
 const allPostApi = async () => {
-        const res = await axios.post('https://notion-proxy-api.vercel.app/api/allPostList')
+    const res = await axios.post('https://notion-proxy-api.vercel.app/api/allPostList')
 
-        return res.data.results;
-    };
+    return res.data.results;
+};
 
-export { categoryListApi, saveCategoryApi, deleteCategoryApi, allPostApi };
+interface PostData {
+    title: string;
+    summary: string;
+    imageUrl: string;
+    tags: { id: string; name: string; }[];
+    content: string;
+}
+
+const insertPostApi = async (postData: PostData) => {
+    const res: any = await axios.post('https://notion-proxy-api.vercel.app/api/insertPost', {postData})
+
+    return res.data.results;
+}
+
+export {categoryListApi, saveCategoryApi, deleteCategoryApi, allPostApi, insertPostApi};

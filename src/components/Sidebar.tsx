@@ -43,6 +43,9 @@ const Sidebar = () => {
                 </ListItemButton>
                 <Collapse in={openManagement} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
+                        <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/posts/create')}>
+                            <ListItemText primary="게시물 작성" />
+                        </ListItemButton>
                         <ListItemButton sx={{ py: 0.4, pl: 4 }} onClick={() => handleNavigation('/posts')}>
                             <ListItemText primary="게시물 관리" />
                         </ListItemButton>
