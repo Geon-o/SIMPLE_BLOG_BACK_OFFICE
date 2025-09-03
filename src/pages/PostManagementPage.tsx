@@ -73,14 +73,16 @@ const PostManagementPage = () => {
             <Grid container spacing={3}>
                 {filteredPosts.map((post) => (
                     <Grid item xs={12} sm={6} md={4} key={post.id}>
-                        <Card sx={{
-                            height: '100%', display: 'flex', flexDirection: 'column',
-                            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: 6,
-                            },
-                        }}>
+                        <Card
+                            sx={(theme) => ({
+                                height: '100%', display: 'flex', flexDirection: 'column',
+                                transition: theme.transitions.create(['transform', 'box-shadow']),
+                                '&:hover': {
+                                    transform: 'translateY(-4px)',
+                                    boxShadow: theme.shadows[6],
+                                },
+                            })}
+                        >
                             <CardMedia
                                 component="img"
                                 height="200"
