@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
+import PostCreationPage from './pages/PostCreationPage';
 import PostManagementPage from './pages/PostManagementPage';
 import TagManagementPage from './pages/TagManagementPage';
 import { supabase } from './apis/SupabaseClient';
@@ -77,6 +78,7 @@ function App() {
             <Route path="/" element={isAuthenticated ? <AdminDashboard/> : <Navigate to="/login"/>}>
                 <Route index element={<p>대시보드 메인 페이지</p>} /> {/* Default content for / */}
                 <Route path="posts" element={<PostManagementPage />} />
+                <Route path="posts/create" element={<PostCreationPage />} />
                 <Route path="tags" element={<TagManagementPage />} />
             </Route>
             {/* Redirect any other path to the main page logic */}
