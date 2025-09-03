@@ -1,116 +1,48 @@
 import {
     Box,
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
     Chip,
-    InputAdornment,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Typography,
+    Grid,
     IconButton,
-    Tabs,
-    Tab,
+    InputAdornment,
+    TextField,
+    Typography
 } from '@mui/material';
-import {styled} from '@mui/material/styles';
-import {useState} from 'react';
-import {Search, Edit, Delete} from '@mui/icons-material';
+import {allPostApi} from '../apis/NotionApi';
+import {useEffect, useState} from "react";
+import {Search, Edit, Delete} from "@mui/icons-material";
 
-// 스타일이 적용된 TableCell 컴포넌트
-const StyledTableCell = styled(TableCell)(({theme}) => ({
-    backgroundColor: theme.palette.grey[100],
-    color: theme.palette.text.primary,
-    fontWeight: 'bold',
-    borderBottom: `2px solid ${theme.palette.divider}`
-}));
-
-// --- 예시 데이터 타입 및 데이터 --- //
 interface Post {
     id: string;
     title: string;
-    category: string;
+    summary: string;
+    imageUrl: string;
     tags: string[];
-    author: string;
     createdAt: string;
-    status: 'Published' | 'Draft';
-}
-
-const mockPosts: Post[] = [
-    {
-        id: '1',
-        title: 'React 상태 관리 라이브러리 비교',
-        category: 'Frontend',
-        tags: ['React', 'State Management', 'Redux', 'MobX'],
-        author: 'John Doe',
-        createdAt: '2023-10-27',
-        status: 'Published',
-    },
-    {
-        id: '2',
-        title: 'Next.js 14의 새로운 기능',
-        category: 'Frontend',
-        tags: ['Next.js', 'React', 'Web Development'],
-        author: 'Jane Smith',
-        createdAt: '2023-10-26',
-        status: 'Published',
-    },
-    {
-        id: '3',
-        title: 'TypeScript 제대로 사용하기',
-        category: 'Programming',
-        tags: ['TypeScript', 'Best Practice'],
-        author: 'Peter Jones',
-        createdAt: '2023-10-25',
-        status: 'Draft',
-    },
-    {
-        id: '4',
-        title: 'Node.js와 Express로 REST API 만들기',
-        category: 'Backend',
-        tags: ['Node.js', 'Express', 'API'],
-        author: 'John Doe',
-        createdAt: '2023-10-24',
-        status: 'Published',
-    },
-];
-
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box sx={{ pt: 3 }}>
-                    {children}
-                </Box>
-            )}
-        </div>
-    );
 }
 
 const PostManagementPage = () => {
-    const [posts] = useState<Post[]>(mockPosts);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedTab, setSelectedTab] = useState(0);
 
-    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-        setSelectedTab(newValue);
-    };
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        allPostApi()
+            .then((r) => {
+                const fetchedPosts: Post[] = r.map((post: any) => ({
+                    id: post.id,
+                    title: post.properties.content.title[0].plain_text,
+                    summary: post.properties.summary.rich_text[0].plain_text,
+                    imageUrl: post.properties.imageUrl.rich_text[0].plain_text,
+                    tags: post.properties.tag.multi_select.map((tag: any) => tag.name),
+                    createdAt: post.created_time,
+                }));
+                setPosts(fetchedPosts);
+            });
+    }, []);
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -122,96 +54,66 @@ const PostManagementPage = () => {
 
     return (
         <Box sx={{padding: {xs: 2, md: 3}}}>
-            <Paper sx={{padding: {xs: 2, md: 3}, borderRadius: 2, boxShadow: 3}}>
-                <Typography variant="h5" gutterBottom sx={{fontWeight: 'bold', marginBottom: 2}}>
-                    게시물 관리
-                </Typography>
+            <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: 3}}>
+                <TextField
+                    size="small"
+                    variant="outlined"
+                    placeholder="게시물 검색..."
+                    onChange={handleSearch}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Search/>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </Box>
 
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={selectedTab} onChange={handleTabChange} aria-label="post management tabs">
-                        <Tab label="목록" />
-                        <Tab label="작성" />
-                    </Tabs>
-                </Box>
-
-                <TabPanel value={selectedTab} index={0}>
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        marginBottom: 3,
-                        flexWrap: 'wrap',
-                        gap: 2
-                    }}>
-                        <TextField
-                            size="small"
-                            variant="outlined"
-                            placeholder="게시물 검색..."
-                            onChange={handleSearch}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Search/>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-
-                    <TableContainer>
-                        <Table sx={{minWidth: 650}} aria-label="post table">
-                            <TableHead>
-                                <TableRow>
-                                    <StyledTableCell>제목</StyledTableCell>
-                                    <StyledTableCell>카테고리</StyledTableCell>
-                                    <StyledTableCell>태그</StyledTableCell>
-                                    <StyledTableCell>작성자</StyledTableCell>
-                                    <StyledTableCell>작성일</StyledTableCell>
-                                    <StyledTableCell>상태</StyledTableCell>
-                                    <StyledTableCell align="right">작업</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {filteredPosts.map((post) => (
-                                    <TableRow key={post.id} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                        <TableCell sx={{fontWeight: 'medium'}}>{post.title}</TableCell>
-                                        <TableCell>{post.category}</TableCell>
-                                        <TableCell>
-                                            <Box sx={{display: 'flex', gap: 0.5, flexWrap: 'wrap'}}>
-                                                {post.tags.map(tag => <Chip key={tag} label={tag} size="small"/>)}
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>{post.author}</TableCell>
-                                        <TableCell>{post.createdAt}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={post.status}
-                                                color={post.status === 'Published' ? 'success' : 'default'}
-                                                size="small"
-                                            />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <IconButton size="small" color="primary">
-                                                <Edit fontSize="small"/>
-                                            </IconButton>
-                                            <IconButton size="small" color="error">
-                                                <Delete fontSize="small"/>
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </TabPanel>
-
-                <TabPanel value={selectedTab} index={1}>
-                    <Typography>게시물 작성 폼이 여기에 표시됩니다.</Typography>
-                </TabPanel>
-
-            </Paper>
+            <Grid container spacing={3}>
+                {filteredPosts.map((post) => (
+                    <Grid item xs={12} sm={6} md={4} key={post.id}>
+                        <Card sx={{
+                            height: '100%', display: 'flex', flexDirection: 'column',
+                            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: 6,
+                            },
+                        }}>
+                            <CardMedia
+                                component="img"
+                                height="200"
+                                image={post.imageUrl}
+                                alt={post.title}
+                            />
+                            <CardContent sx={{flexGrow: 1}}>
+                                <Typography gutterBottom variant="h6" component="div">
+                                    {post.title}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {post.summary}
+                                </Typography>
+                                <Box sx={{mt: 2}}>
+                                    {post.tags.map(tag => <Chip key={tag} label={tag} size="small"
+                                                               sx={{mr: 0.5, mb: 0.5}}/>)}
+                                </Box>
+                            </CardContent>
+                            <CardActions sx={{justifyContent: 'flex-end'}}>
+                                <IconButton size="small" color="primary">
+                                    <Edit fontSize="small"/>
+                                </IconButton>
+                                <IconButton size="small" color="error">
+                                    <Delete fontSize="small"/>
+                                </IconButton>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
         </Box>
     );
 };
 
 export default PostManagementPage;
+
