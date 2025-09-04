@@ -15,7 +15,7 @@ const saveCategoryApi = async (saveData: { title: string }) => {
 };
 
 const deleteCategoryApi = async (pageId: string) => {
-    const res = await axios.post('https://notion-proxy-api.vercel.app/api/deleteCategory', {pageId: pageId}, {
+    const res = await axios.post('https://notion-proxy-api.vercel.app/api/deleteUtil', {pageId: pageId}, {
         headers: {
             'Content-Type': 'application/json'
         }
@@ -43,4 +43,13 @@ const insertPostApi = async (postData: PostData) => {
     return res.data.results;
 }
 
-export {categoryListApi, saveCategoryApi, deleteCategoryApi, allPostApi, insertPostApi};
+const deletePostApi = async (pageId: string) => {
+    const res = await axios.post('https://notion-proxy-api.vercel.app/api/deleteUtil', {pageId: pageId}, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    return res.data.results;
+}
+
+export {categoryListApi, saveCategoryApi, deleteCategoryApi, allPostApi, insertPostApi, deletePostApi};

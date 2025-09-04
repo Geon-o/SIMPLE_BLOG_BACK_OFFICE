@@ -1,17 +1,19 @@
 import {
+    Backdrop,
     Box,
     Card,
     CardActions,
     CardContent,
     CardMedia,
     Chip,
+    CircularProgress,
     IconButton,
     InputAdornment,
     TextField,
     Typography
 } from '@mui/material';
 import Grid from '@mui/material/Grid'; // Correct import for Grid v7+
-import {allPostApi} from '../apis/NotionApi';
+import {allPostApi, deletePostApi} from '../apis/NotionApi';
 import {useEffect, useState} from "react";
 import {Search, Edit, Delete} from "@mui/icons-material";
 
@@ -28,8 +30,9 @@ const PostManagementPage = () => {
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
+    const fetchAllPosts = async () => {
         allPostApi()
             .then((r) => {
                 const fetchedPosts: Post[] = r.map((post: any) => ({
@@ -42,11 +45,32 @@ const PostManagementPage = () => {
                 }));
                 setPosts(fetchedPosts);
             });
+    }
+
+    useEffect(() => {
+        fetchAllPosts();
     }, []);
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
+
+    const handelDeletePost = (postId: string) => {
+        if (confirm("삭제?")) {
+            setIsLoading(true);
+            deletePostApi(postId)
+                .then(async () => {
+                    alert('삭제완');
+                    await fetchAllPosts();
+                })
+                .catch(() => {
+                    alert('삭제 실패');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                })
+        }
+    }
 
     const filteredPosts = posts.filter((post) =>
         post.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -105,7 +129,7 @@ const PostManagementPage = () => {
                                 <IconButton size="small" color="primary">
                                     <Edit fontSize="small"/>
                                 </IconButton>
-                                <IconButton size="small" color="error">
+                                <IconButton size="small" color="error" onClick={() => handelDeletePost(post.id)}>
                                     <Delete fontSize="small"/>
                                 </IconButton>
                             </CardActions>
@@ -113,6 +137,12 @@ const PostManagementPage = () => {
                     </Grid>
                 ))}
             </Grid>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Box>
     );
 };
