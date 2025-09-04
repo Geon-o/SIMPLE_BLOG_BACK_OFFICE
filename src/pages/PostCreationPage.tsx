@@ -11,7 +11,7 @@ interface TagProps {
 const PostCreationPage = () => {
     const [title, setTitle] = useState('');
     const [summary, setSummary] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
+    // const [imageUrl, setImageUrl] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [content, setContent] = useState('**Hello world!!!**');
     const [availableTags, setAvailableTags] = useState<TagProps[]>([]);
@@ -40,7 +40,7 @@ const PostCreationPage = () => {
         const postData = {
             title,
             summary,
-            imageUrl,
+            // imageUrl,
             tags: selectedTags.map(tagName => availableTags.find(tag => tag.name === tagName)).filter(tag => tag !== undefined) as TagProps[],
             content,
         };
@@ -68,7 +68,7 @@ const PostCreationPage = () => {
         <Box sx={{padding: {xs: 2, md: 3}}}>
             <Paper sx={{padding: {xs: 2, md: 3}, borderRadius: 2, boxShadow: 3, maxWidth: 'md', margin: 'auto'}}>
                 <Typography variant="h5" gutterBottom sx={{fontWeight: 'bold', marginBottom: 2}}>
-                    게시물 작성
+                    게시글 작성
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <Box sx={{display: 'flex', flexDirection: 'column'}}>
@@ -92,15 +92,15 @@ const PostCreationPage = () => {
                             onChange={(e) => setSummary(e.target.value)}
                             sx={{mb: 3}}
                         />
-                        <TextField
-                            required
-                            fullWidth
-                            id="imageUrl"
-                            label="이미지 URL"
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                            sx={{mb: 3}}
-                        />
+                        {/*<TextField*/}
+                        {/*    required*/}
+                        {/*    fullWidth*/}
+                        {/*    id="imageUrl"*/}
+                        {/*    label="이미지 URL"*/}
+                        {/*    value={imageUrl}*/}
+                        {/*    onChange={(e) => setImageUrl(e.target.value)}*/}
+                        {/*    sx={{mb: 3}}*/}
+                        {/*/>*/}
                         <FormControl sx={{mb: 3, width: '50%'}}>
                             <InputLabel id="tags-select-label">태그</InputLabel>
                             <Select

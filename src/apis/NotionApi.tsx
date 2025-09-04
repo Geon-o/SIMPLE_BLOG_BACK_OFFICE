@@ -32,7 +32,7 @@ const allPostApi = async () => {
 interface PostData {
     title: string;
     summary: string;
-    imageUrl: string;
+    // imageUrl: string;
     tags: { id: string; name: string; }[];
     content: string;
 }
