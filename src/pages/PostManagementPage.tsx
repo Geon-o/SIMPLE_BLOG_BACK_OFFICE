@@ -36,7 +36,7 @@ const PostManagementPage = () => {
                     id: post.id,
                     title: post.properties.content.title[0].plain_text,
                     summary: post.properties.summary.rich_text[0].plain_text,
-                    imageUrl: post.properties.imageUrl.rich_text[0].plain_text,
+                    imageUrl: post.properties.imageUrl.files.length > 0 ? post.properties.imageUrl.files[0].file.url : 'https://picsum.photos/400/300?random=1',
                     tags: post.properties.tag.multi_select.map((tag: any) => tag.name),
                     createdAt: post.created_time,
                 }));
@@ -58,7 +58,7 @@ const PostManagementPage = () => {
                 <TextField
                     size="small"
                     variant="outlined"
-                    placeholder="게시물 검색..."
+                    placeholder="게시글 검색..."
                     onChange={handleSearch}
                     InputProps={{
                         startAdornment: (
