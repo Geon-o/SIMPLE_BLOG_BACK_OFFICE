@@ -1,7 +1,9 @@
 import {Box, Typography, Paper, TextField, Button, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, Backdrop, CircularProgress} from '@mui/material';
 import {useState, useEffect} from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { categoryListApi, insertPostApi } from '../apis/NotionApi';
+import {useParams, useNavigate} from 'react-router-dom';
+import { categoryListApi, insertPostApi, allPostApi, fetchNotionPage, updatePostApi } from '../apis/NotionApi';
+import { recordMapToMarkdown } from '../utils/recordMapToMarkdown';
 
 interface TagProps {
     id: string;
@@ -9,29 +11,49 @@ interface TagProps {
 }
 
 const PostCreationPage = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [isEditing, setIsEditing] = useState(false);
     const [title, setTitle] = useState('');
     const [summary, setSummary] = useState('');
-    // const [imageUrl, setImageUrl] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [content, setContent] = useState('**Hello world!!!**');
+    const [content, setContent] = useState('');
     const [availableTags, setAvailableTags] = useState<TagProps[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const fetchTags = async () => {
-            try {
-                const response = await categoryListApi();
-                const tags: TagProps[] = response.map((item: any) => ({
-                    id: item.id,
-                    name: item.properties.title.title[0]?.plain_text,
-                }));
-                setAvailableTags(tags);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
+        const fetchAndSetData = async () => {
+            const tagsResponse = await categoryListApi();
+            const tags: TagProps[] = tagsResponse.map((item: any) => ({
+                id: item.id,
+                name: item.properties.title.title[0]?.plain_text.trim(),
+            }));
+            setAvailableTags(tags);
+
+            if (id) {
+                setIsEditing(true);
+                setIsLoading(true);
+                const [posts, pageData] = await Promise.all([allPostApi(), fetchNotionPage(id)]);
+                const post = posts.find(p => p.id === id);
+                if (post && pageData) {
+                    setTitle(post.properties.content.title[0].plain_text);
+                    setSummary(post.properties.summary.rich_text[0].plain_text);
+                    setSelectedTags(post.properties.tag.multi_select.map(t => t.name.trim()));
+                    const markdownContent = recordMapToMarkdown(pageData);
+                    setContent(markdownContent);
+                }
+                setIsLoading(false);
+            } else {
+                setIsEditing(false);
+                setTitle('');
+                setSummary('');
+                setSelectedTags([]);
+                setContent('');
             }
         };
-        fetchTags();
-    }, []);
+
+        fetchAndSetData();
+    }, [id]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -40,21 +62,23 @@ const PostCreationPage = () => {
         const postData = {
             title,
             summary,
-            // imageUrl,
-            tags: selectedTags.map(tagName => availableTags.find(tag => tag.name === tagName)).filter(tag => tag !== undefined) as TagProps[],
+            tags: selectedTags.map(tagName => availableTags.find(tag => tag.name === tagName.trim())).filter(tag => tag !== undefined) as TagProps[],
             content,
         };
 
-        insertPostApi(postData)
+        const apiCall = isEditing && id ? updatePostApi(id, postData) : insertPostApi(postData);
+
+        apiCall
             .then(() => {
-                alert('업로드 완료');
+                alert(`게시글 ${isEditing ? '수정' : '작성'} 완료`);
+                navigate('/posts');
             })
             .catch(() => {
-                alert('업로드 실패');
+                alert(`게시글 ${isEditing ? '수정' : '작성'} 실패`);
             })
             .finally(() => {
                 setIsLoading(false);
-            })
+            });
     };
 
     const handleTagChange = (event: any) => {
@@ -68,7 +92,7 @@ const PostCreationPage = () => {
         <Box sx={{padding: {xs: 2, md: 3}}}>
             <Paper sx={{padding: {xs: 2, md: 3}, borderRadius: 2, boxShadow: 3, maxWidth: 'md', margin: 'auto'}}>
                 <Typography variant="h5" gutterBottom sx={{fontWeight: 'bold', marginBottom: 2}}>
-                    게시글 작성
+                    {isEditing ? '게시글 수정' : '게시글 작성'}
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <Box sx={{display: 'flex', flexDirection: 'column'}}>
@@ -92,15 +116,6 @@ const PostCreationPage = () => {
                             onChange={(e) => setSummary(e.target.value)}
                             sx={{mb: 3}}
                         />
-                        {/*<TextField*/}
-                        {/*    required*/}
-                        {/*    fullWidth*/}
-                        {/*    id="imageUrl"*/}
-                        {/*    label="이미지 URL"*/}
-                        {/*    value={imageUrl}*/}
-                        {/*    onChange={(e) => setImageUrl(e.target.value)}*/}
-                        {/*    sx={{mb: 3}}*/}
-                        {/*/>*/}
                         <FormControl sx={{mb: 3, width: '50%'}}>
                             <InputLabel id="tags-select-label">태그</InputLabel>
                             <Select
@@ -136,9 +151,17 @@ const PostCreationPage = () => {
                             />
                         </Box>
                         <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-                            <Button type="submit" sx={{backgroundColor: '#2c5e4c', color: '#fff'}}>
-                                업로드
+                            <Button type="submit" sx={{backgroundColor: '#2c5e4c', color: '#fff', borderRadius: '13px', mr: 2 }}>
+                                {isEditing ? '수정' : '업로드'}
                             </Button>
+                            {isEditing && (
+                                <Button
+                                    onClick={() => navigate('/post', { state: { pageId: id } })}
+                                   sx={{ backgroundColor: '#2c5e4c', color: '#ffffff', borderRadius: '13px'}}
+                                >
+                                    취소
+                                </Button>
+                            )}
                         </Box>
                     </Box>
                 </form>

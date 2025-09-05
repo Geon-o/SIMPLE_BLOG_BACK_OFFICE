@@ -15,6 +15,7 @@ import {
 import Grid from '@mui/material/Grid'; // Correct import for Grid v7+
 import {allPostApi, deletePostApi} from '../apis/NotionApi';
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {Search, Edit, Delete} from "@mui/icons-material";
 
 interface Post {
@@ -28,6 +29,7 @@ interface Post {
 
 const PostManagementPage = () => {
 
+    const navigate = useNavigate();
     const [posts, setPosts] = useState<Post[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -98,8 +100,10 @@ const PostManagementPage = () => {
                 {filteredPosts.map((post) => (
                     <Grid gridColumn={{ xs: 'span 12', sm: 'span 6', md: 'span 4' }} key={post.id}>
                         <Card
+                            onClick={() => navigate('../post', { state: { pageId: post.id } })}
                             sx={(theme) => ({
                                 height: '100%', display: 'flex', flexDirection: 'column',
+                                cursor: 'pointer',
                                 transition: theme.transitions.create(['transform', 'box-shadow']),
                                 '&:hover': {
                                     transform: 'translateY(-4px)',

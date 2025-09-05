@@ -10,6 +10,7 @@ import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import { Box } from '@mui/material';
+import {DetailContentViewPage} from "@/pages/DetailContentViewPage.tsx";
 
 const AdminDashboard = () => {
     return (
@@ -79,6 +80,8 @@ function App() {
                 <Route index element={<p>대시보드 메인 페이지</p>} /> {/* Default content for / */}
                 <Route path="posts" element={<PostManagementPage />} />
                 <Route path="posts/create" element={<PostCreationPage />} />
+                <Route path="posts/edit/:id" element={<PostCreationPage />} />
+                <Route path="post" element={<DetailContentViewPage />} />
                 <Route path="tags" element={<TagManagementPage />} />
             </Route>
             {/* Redirect any other path to the main page logic */}
