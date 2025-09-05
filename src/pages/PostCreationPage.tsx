@@ -34,11 +34,11 @@ const PostCreationPage = () => {
                 setIsEditing(true);
                 setIsLoading(true);
                 const [posts, pageData] = await Promise.all([allPostApi(), fetchNotionPage(id)]);
-                const post = posts.find(p => p.id === id);
+                const post = posts.find((p: any) => p.id === id);
                 if (post && pageData) {
                     setTitle(post.properties.content.title[0].plain_text);
                     setSummary(post.properties.summary.rich_text[0].plain_text);
-                    setSelectedTags(post.properties.tag.multi_select.map(t => t.name.trim()));
+                    setSelectedTags(post.properties.tag.multi_select.map((t: any) => t.name.trim()));
                     const markdownContent = recordMapToMarkdown(pageData);
                     setContent(markdownContent);
                 }
